@@ -14,27 +14,25 @@ struct Juice {
     var name: String
     var ingredients: Dictionary<Fruit, Int>
 }
-// 쥬스 메이커 타입
+// MARK: --- 쥬스 메이커 타입
 struct JuiceMaker {
     let fruitStore = FruitStore.shared
 
-    func makeJuice(_ juice: Juice) {
-        do {
-            try checkStock(juice.ingredients)
-            
-            for (fruit, removingQuantity) in juice.ingredients {
-                fruitStore.changeStock(fruit, removingQuantity)
-            }
-//            NotificationCenter.default.post(name: Notification.Name(rawValue: "makeJuiceSuccess"), object: nil, userInfo: ["쥬스이름": juice.description])
-        } catch {
-//            NotificationCenter.default.post(name: Notification.Name(rawValue: "makeJuiceFail"), object: nil)
+    func makeJuice(_ juice: Juice) throws -> String {
+        let isAvailableStock = checkStock(juice.ingredients)
+        guard isAvailableStock else { throw JuiceMakerError.outOfStock }
+        
+        for (fruit, removingQuantity) in juice.ingredients {
+            fruitStore.changeStock(fruit, removingQuantity)
         }
+        return juice.name
     }
-    func checkStock(_ ingredients: Dictionary<Fruit, Int>) throws {
+    func checkStock(_ ingredients: Dictionary<Fruit, Int>) -> Bool {
         for (fruit, removingQuantity) in ingredients {
             if fruitStore.currentStock(fruit) < removingQuantity {
-                throw JuiceMakerError.outOfStock
+                return false
             }
         }
+        return true
     }
 }

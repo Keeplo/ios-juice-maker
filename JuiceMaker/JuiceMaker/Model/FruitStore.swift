@@ -13,7 +13,7 @@ enum Fruit: CaseIterable {
     case kiwi
     case mango
 }
-// 과일 타입
+// MARK: --- 과일 타입
 class FruitStore: NSObject {
     static let shared = FruitStore()
     
@@ -26,33 +26,24 @@ class FruitStore: NSObject {
     subscript(_ fruit: Fruit) -> Int {
         get {
             switch fruit {
-            case .strawberry:
-                return strawberry
-            case .banana:
-                return banana
-            case .pineapple:
-                return pineapple
-            case .kiwi:
-                return kiwi
-            case .mango:
-                return mango
+            case .strawberry:   return strawberry
+            case .banana:       return banana
+            case .pineapple:    return pineapple
+            case .kiwi:         return kiwi
+            case .mango:        return mango
             }
         }
         set {
             switch fruit {
-            case .strawberry:
-                strawberry = newValue
-            case .banana:
-                banana = newValue
-            case .pineapple:
-                pineapple = newValue
-            case .kiwi:
-                kiwi = newValue
-            case .mango:
-                mango = newValue
+            case .strawberry:   strawberry = newValue
+            case .banana:       banana = newValue
+            case .pineapple:    pineapple = newValue
+            case .kiwi:         kiwi = newValue
+            case .mango:        mango = newValue
             }
         }
     }
+    
     func currentStock(_ fruit: Fruit) -> Int {
         return self[fruit]
     }

@@ -26,28 +26,17 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-      
-//        NotificationCenter.default.addObserver(self, selector: #selector(alertMakingJuiceSuccess(_:)),
-//                                               name: Notification.Name(rawValue: "makeJuiceSuccess"), object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(alertMakingJuiceFail),
-//                                               name: Notification.Name(rawValue: "makeJuiceFail"), object: nil)
-
         observations = [
             juiceMaker.fruitStore.observe(\.strawberry, options: [.new]) { _, _ in
-                self.updateUILabel(.strawberry)
-            },
+                self.updateUILabel(.strawberry) },
             juiceMaker.fruitStore.observe(\.banana, options: [.new]) { _, _ in
-                self.updateUILabel(.banana)
-            },
+                self.updateUILabel(.banana) },
             juiceMaker.fruitStore.observe(\.pineapple, options: [.new]) { _, _ in
-                self.updateUILabel(.pineapple)
-            },
+                self.updateUILabel(.pineapple) },
             juiceMaker.fruitStore.observe(\.kiwi, options: [.new]) { _, _ in
-                self.updateUILabel(.kiwi)
-            },
+                self.updateUILabel(.kiwi) },
             juiceMaker.fruitStore.observe(\.mango, options: [.new]) { _, _ in
-                self.updateUILabel(.mango)
-            }
+                self.updateUILabel(.mango) }
         ]
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -58,25 +47,25 @@ class MainViewController: UIViewController {
     }
     
     @IBAction func strawberryJuiceOrder(_ sender: Any) {
-        juiceMaker.makeJuice(strawberryJuice)
+        selectResultAlert(strawberryJuice)
     }
     @IBAction func bananaJuiceOrder(_ sender: Any) {
-        juiceMaker.makeJuice(bananaJuice)
+        selectResultAlert(bananaJuice)
     }
     @IBAction func mangoJuiceOrder(_ sender: Any) {
-        juiceMaker.makeJuice(mangoJuice)
+        selectResultAlert(mangoJuice)
     }
     @IBAction func kiwiJuiceOrder(_ sender: Any) {
-        juiceMaker.makeJuice(kiwiJuice)
+        selectResultAlert(kiwiJuice)
     }
     @IBAction func pineappleJuiceOrder(_ sender: Any) {
-        juiceMaker.makeJuice(pineappleJuice)
+        selectResultAlert(pineappleJuice)
     }
     @IBAction func strawberryBananaJuiceOrder(_ sender: Any) {
-        juiceMaker.makeJuice(strawberryBananaJuice)
+        selectResultAlert(strawberryBananaJuice)
     }
     @IBAction func mangoKiwiJuiceOrder(_ sender: Any) {
-        juiceMaker.makeJuice(mangoKiwiJuice)
+        selectResultAlert(mangoKiwiJuice)
     }
     @IBAction func moveModifyView(_ sender: Any) {
         performSegue(withIdentifier: "showStocks", sender: nil)
@@ -98,27 +87,31 @@ extension MainViewController {
             mangoLabel.text = String(juiceMaker.fruitStore.currentStock(fruit))
         }
     }
-    func alertMakingJuiceSuccess(_ juiceName: String) {
-//        guard let userInfo = notification.userInfo else {
-//            print("userInfo 에러"); return
-//        }
-//        guard let userInfoValue = userInfo["쥬스이름"], let juiceName = userInfoValue as? String else {
-//            print("userInfoValue 에러"); return
-//        }
-        let alert = UIAlertController(title: "\(juiceName) 쥬스 나왔습니다! 맛있게 드세요!", message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: "감사합니다.", style: .default)
-        alert.addAction(confirmAction)
-        present(alert, animated: true, completion: nil)
-    }
-    func alertMakingJuiceFail() {
-        let alert = UIAlertController(title: "재료가 모자라요. 재고를 수정할까요?", message: nil, preferredStyle: .alert)
-
-        let confirmAction = UIAlertAction(title: "예", style: .default) { _ in
-            self.performSegue(withIdentifier: "showStocks", sender: nil)
+    func selectResultAlert(_ juice: Juice) {
+        do {
+            let juiceName = try juiceMaker.makeJuice(juice)
+            makeSuccessAlert(juiceName)
+        } catch {
+            makeFailAlert()
         }
-        let cancelAction = UIAlertAction(title: "아니오", style: .default)
-        alert.addAction(confirmAction)
-        alert.addAction(cancelAction)
+    }
+    func makeSuccessAlert(_ juiceName: String) {
+        let title = "\(juiceName) 쥬스 나왔습니다! 맛있게 드세요!"
+        let actions = [UIAlertAction(title: "감사합니다.", style: .default)]
+        presentAlert(title: title, message: nil, actions: actions)
+    }
+    func makeFailAlert() {
+        let title = "재료가 모자라요. 재고를 수정할까요?"
+        let actions = [UIAlertAction(title: "예", style: .default) { _ in
+                        self.performSegue(withIdentifier: "showStocks", sender: nil)
+                    }, UIAlertAction(title: "아니오", style: .default)]
+        presentAlert(title: title, message: nil, actions: actions)
+    }
+    func presentAlert(title: String, message: String?, actions: [UIAlertAction]) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        for action in actions {
+            alert.addAction(action)
+        }
         present(alert, animated: true, completion: nil)
     }
 }
